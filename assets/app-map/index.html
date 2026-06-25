@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mapa Turístico La Calera | Turisoft</title>
+    <meta name="description" content="Explora atractivos, veredas, rutas, servicios y datos de gestión turística de La Calera, Cundinamarca, en el mapa interactivo de Turisoft." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#04211d" />
+    <meta name="application-name" content="Mapa Turístico La Calera" />
+    <link rel="canonical" href="https://app.turisoft.org/" />
+    <link rel="icon" href="./turisoft-logo.png" />
+    <link rel="apple-touch-icon" href="./turisoft-logo.png" />
+    <link rel="manifest" href="./site.webmanifest" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="preconnect" href="https://tile.openstreetmap.org" />
+    <link rel="dns-prefetch" href="https://unpkg.com" />
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+    <meta property="og:site_name" content="Turisoft" />
+    <meta property="og:title" content="Mapa Turístico La Calera | Turisoft" />
+    <meta property="og:description" content="Mapa interactivo para descubrir atractivos, veredas, rutas y servicios turísticos de La Calera." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://app.turisoft.org/" />
+    <meta property="og:image" content="https://app.turisoft.org/photos/embalse-san-rafael.jpg" />
+    <meta property="og:locale" content="es_CO" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mapa Turístico La Calera | Turisoft" />
+    <meta name="twitter:description" content="Explora atractivos, veredas, rutas y servicios turísticos de La Calera." />
+    <meta name="twitter:image" content="https://app.turisoft.org/photos/embalse-san-rafael.jpg" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./turisoft-ficha.css" />
+  </head>
+  <body>
+    <main class="map-shell">
+      <section id="map" aria-label="Mapa turístico de La Calera"></section>
+
+      <header class="topbar">
+        <div class="brand">
+          <img class="brand-logo" src="./turisoft-logo.png" alt="turisoft.org" />
+          <span class="subbrand">La Calera · Gestión Turística</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="mode-switch" aria-label="Modo de uso">
+            <button class="is-active" data-mode="traveler">Viajero</button>
+            <button data-mode="manager">Gestor</button>
+          </div>
+          <button id="stats-button" class="floating-action" hidden>Estadísticas</button>
+        </div>
+      </header>
+
+      <aside class="panel layers-panel">
+        <div class="panel-head">
+          <p>Capas de información</p>
+          <input id="search" type="search" placeholder="Buscar lugares..." />
+        </div>
+        <div id="layers" class="layer-list"></div>
+        <div class="visible-head">
+          <span>Lugares visibles</span>
+          <strong id="visible-count">0</strong>
+        </div>
+        <div id="places" class="place-list"></div>
+      </aside>
+
+      <aside id="detail" class="panel detail-panel" hidden></aside>
+
+      <section id="stats" class="stats-modal" hidden>
+        <div class="stats-card">
+          <button class="icon-button" id="close-stats" aria-label="Cerrar">x</button>
+          <div id="stats-body"></div>
+        </div>
+      </section>
+
+      <div id="rnt-modal" class="mini-modal" hidden>
+        <div class="mini-card" id="rnt-card"></div>
+      </div>
+
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "TouristAttraction",
+        "name": "Mapa Turístico La Calera",
+        "description": "Mapa interactivo de atractivos, veredas, rutas, servicios y datos de gestión turística de La Calera, Cundinamarca.",
+        "url": "https://app.turisoft.org/",
+        "image": "https://app.turisoft.org/photos/embalse-san-rafael.jpg",
+        "areaServed": {
+          "@type": "AdministrativeArea",
+          "name": "La Calera, Cundinamarca, Colombia"
+        },
+        "provider": {
+          "@type": "Organization",
+          "name": "Turisoft",
+          "url": "https://turisoft.org/"
+        }
+      }
+    </script>
+    <script src="./routes.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /*.md$
+Disallow: /turisoft-app-map.zip
+
+Sitemap: https://app.turisoft.org/sitemap.xml

@@ -1,0 +1,19 @@
+{
+  "name": "Mapa Turístico La Calera",
+  "short_name": "Mapa La Calera",
+  "description": "Mapa interactivo de atractivos, rutas, veredas y servicios turísticos de La Calera.",
+  "start_url": "https://app.turisoft.org/",
+  "scope": "https://app.turisoft.org/",
+  "display": "standalone",
+  "background_color": "#04211d",
+  "theme_color": "#04211d",
+  "lang": "es-CO",
+  "icons": [
+    {
+      "src": "turisoft-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
