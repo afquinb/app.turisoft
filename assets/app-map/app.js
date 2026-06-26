@@ -110,12 +110,16 @@ const visibleCount = document.querySelector("#visible-count");
 const searchInput = document.querySelector("#search");
 const detail = document.querySelector("#detail");
 const modeContext = document.querySelector("#mode-context");
+const toggleLayersButton = document.querySelector("#toggle-layers");
+const openLayersButton = document.querySelector("#open-layers");
 const statsButton = document.querySelector("#stats-button");
 const statsModal = document.querySelector("#stats");
 const mobilePanelButtons = document.querySelectorAll("[data-mobile-panel]");
 const modeButtons = document.querySelectorAll("[data-mode]");
 document.body.dataset.mobilePanel = "map";
 document.body.dataset.mode = state.mode;
+document.body.dataset.leftPanel = "open";
+if (openLayersButton) openLayersButton.hidden = true;
 
 function isMobileLayout() {
   return window.matchMedia("(max-width: 820px)").matches;
@@ -124,6 +128,7 @@ function isMobileLayout() {
 function setMobilePanel(panel) {
   const target = panel === "detail" && detail.hidden ? "places" : panel;
   document.body.dataset.mobilePanel = target;
+  if (target !== "map") setLeftPanelCollapsed(false);
   mobilePanelButtons.forEach(button => {
     button.classList.toggle("is-active", button.dataset.mobilePanel === target);
     button.setAttribute("aria-pressed", button.dataset.mobilePanel === target ? "true" : "false");
@@ -135,6 +140,9 @@ mobilePanelButtons.forEach(button => {
   button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
   button.addEventListener("click", () => setMobilePanel(button.dataset.mobilePanel));
 });
+
+toggleLayersButton?.addEventListener("click", () => setLeftPanelCollapsed(true));
+openLayersButton?.addEventListener("click", () => setLeftPanelCollapsed(false));
 
 modeButtons.forEach(button => {
   button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
@@ -161,6 +169,13 @@ function render() {
   renderLayers();
   renderPlaces();
   updateZones();
+}
+
+function setLeftPanelCollapsed(collapsed) {
+  document.body.dataset.leftPanel = collapsed ? "collapsed" : "open";
+  if (toggleLayersButton) toggleLayersButton.setAttribute("aria-expanded", collapsed ? "false" : "true");
+  if (openLayersButton) openLayersButton.hidden = !collapsed;
+  window.setTimeout(() => map.invalidateSize(), 120);
 }
 
 function setMode(mode) {
@@ -262,7 +277,7 @@ function renderPlaces() {
     button.className = `place-row ${state.activePlaceId === place.id ? "is-active" : ""}`;
     button.type = "button";
     button.innerHTML = `
-      <span class="dot place-dot" style="background:${layer.color}"></span>
+      ${buildPlaceThumb(place, layer)}
       <strong class="place-copy">
         <span class="place-title">${place.name}</span>
         ${buildPlaceRowMeta(place, layer)}
@@ -271,6 +286,22 @@ function renderPlaces() {
     button.addEventListener("click", () => selectPlace(place.id));
     placeList.appendChild(button);
   });
+}
+
+function buildPlaceThumb(place, layer) {
+  if (place.image) {
+    return `
+      <span class="place-thumb has-image" style="--thumb-color:${layer.color}">
+        <img src="${place.image}" alt="${place.name}" loading="lazy" decoding="async">
+      </span>
+    `;
+  }
+  const initial = place.name ? place.name.trim().charAt(0).toUpperCase() : "•";
+  return `
+    <span class="place-thumb is-fallback" style="--thumb-color:${layer.color}">
+      <span aria-hidden="true">${initial}</span>
+    </span>
+  `;
 }
 
 function buildPlaceRowMeta(place, layer) {
