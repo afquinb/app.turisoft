@@ -1,0 +1,9 @@
+{
+  "name": "turisoft-app-map-stage",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node backend/server.mjs",
+    "check": "node --check app.js && node --check data/catalog.js && node --check ui/icons.js && node --check backend/catalog-repository.mjs && node --check backend/server.mjs"
+  }
+}

@@ -1,136 +1,14 @@
-const MAP_CENTER = [4.7208, -73.9693];
+import { MAP_CENTER, ITINERARIES, RNT, TAG_MAP, ZONES, ZONE_STYLE, layers, places } from "./data/catalog.js";
+import { ICONS } from "./ui/icons.js";
 
-/* Categorías derivadas del mapa oficial "La Calera.travel".
-   Ver REFERENTE-mapa-lacalera.md. Coordenadas APROXIMADAS por sector. */
-const layers = [
-  { id: "naturaleza",  label: "Naturaleza y paisaje",        color: "#22c55e", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "aventura",    label: "Aventura y deportes",         color: "#f97316", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "rutas",       label: "Rutas y senderos",            color: "#2dd4bf", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "cultura",     label: "Cultura y patrimonio",        color: "#a855f7", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "gastronomia", label: "Gastronomía",                 color: "#f59e0b", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "alojamiento", label: "Alojamiento y camping",       color: "#38bdf8", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "servicios",   label: "Servicios",                   color: "#64748b", defaultOn: true,  roles: ["traveler", "manager"] },
-  { id: "veredas",     label: "Veredas y centros poblados",  color: "#14b8a6", defaultOn: false, roles: ["manager"] },
-  { id: "uso",         label: "Uso del territorio",          color: "#D64545", defaultOn: true,  roles: ["manager"], zones: true }
-];
-
-const attractions = [
-  { id: 1, name: "La Calera · Casco Urbano", layerId: "cultura", vereda: "Casco urbano", lat: 4.7208, lng: -73.9693, rating: 4.6,
-    activities: ["Patrimonio", "Gastronomía", "Punto de partida"],
-    description: "Centro histórico y punto cero para iniciar recorridos, tomar café local y conectar con las rutas rurales.",
-    tips: "Ideal como punto de señalización turística y códigos QR.", image: "./photos/parque-principal.jpg" },
-  { id: 2, name: "Embalse San Rafael", layerId: "naturaleza", vereda: "San Rafael", lat: 4.7520, lng: -73.9920, rating: 4.8,
-    activities: ["Caminatas", "Paisaje", "Avistamiento"],
-    description: "Embalse de alto valor escénico asociado al agua, la montaña y la vista regional.",
-    tips: "Verificar condiciones de acceso. Gran potencial para contemplación e interpretación ambiental.", image: "./photos/embalse-san-rafael.jpg" },
-  { id: 3, name: "Cerro de la Pita · Parapente", layerId: "aventura", vereda: "La Toma", lat: 4.7350, lng: -73.9850, rating: 4.7,
-    activities: ["Parapente", "Escalada", "Mirador"],
-    description: "Cerro emblemático para vuelo en parapente y deportes de altura con panorámicas del valle." },
-  { id: 4, name: "Pictogramas Indígenas", layerId: "cultura", vereda: "La Toma", lat: 4.7300, lng: -73.9760, rating: 4.5,
-    activities: ["Patrimonio", "Arte rupestre"],
-    description: "Vestigios de arte rupestre muisca; valor arqueológico y cultural del territorio." },
-  { id: 5, name: "Ruinas Indígenas", layerId: "cultura", vereda: "San José de la Concepción", lat: 4.7600, lng: -73.9650, rating: 4.3,
-    activities: ["Patrimonio", "Historia"],
-    description: "Referente histórico precolombino dentro del corredor norte del municipio." },
-  { id: 6, name: "Peña de las Águilas", layerId: "rutas", vereda: "Buenos Aires La Epifanía", lat: 4.73869, lng: -73.95158, rating: 4.6, route: true,
-    activities: ["Escalada", "Mirador", "Cerro"],
-    description: "Formación rocosa para escalada y observación de aves rapaces." },
-  { id: 7, name: "Cascadas Tunjaque", layerId: "naturaleza", vereda: "Jerusalén", lat: 4.6650, lng: -73.9400, rating: 4.7,
-    activities: ["Caminatas", "Cascada", "Baño"],
-    description: "Conjunto de saltos de agua en el sur del municipio, rodeados de bosque.", image: "./photos/ruta-el-hato.jpg" },
-  { id: 8, name: "Cascada Mundo Nuevo", layerId: "naturaleza", vereda: "Mundo Nuevo", lat: 4.6700, lng: -73.8950, rating: 4.5,
-    activities: ["Caminatas", "Cascada"],
-    description: "Salto de agua en el sector sur-oriental, cercano al límite con Fómeque." },
-  { id: 9, name: "Peña Tunjaque", layerId: "naturaleza", vereda: "Tunjaque", lat: 4.6700, lng: -73.9450, rating: 4.4,
-    activities: ["Escalada", "Cerro", "Mirador"],
-    description: "Peñasco con rutas de escalada y vistas hacia el sur del territorio." },
-  { id: 10, name: "Cerro Verde", layerId: "naturaleza", vereda: "El Volcán", lat: 4.7050, lng: -73.9300, rating: 4.5,
-    activities: ["Caminatas", "Cerro", "Mirador"],
-    description: "Cerro de la zona central-sur, ideal para caminatas de medio día." },
-  { id: 11, name: "Humedal La Chucua", layerId: "naturaleza", vereda: "La Polonia", lat: 4.6900, lng: -73.8950, rating: 4.3,
-    activities: ["Avistamiento", "Ecosistema"],
-    description: "Humedal con biodiversidad asociada al límite con Fómeque." },
-  { id: 12, name: "Laguna Brava", layerId: "naturaleza", vereda: "La Jangada", lat: 4.6800, lng: -73.8980, rating: 4.4,
-    activities: ["Paisaje", "Avistamiento"],
-    description: "Espejo de agua natural en el sector oriental del municipio." },
-  { id: 13, name: "Mirador de la vía a Bogotá", layerId: "naturaleza", vereda: "Camino al Meta", lat: 4.6968, lng: -74.0003, rating: 4.7,
-    activities: ["Mirador", "Fotografía"],
-    description: "Parada con visuales amplias hacia el borde oriental de Bogotá.",
-    tips: "Requiere manejo de parqueo y seguridad vial.", image: "./photos/mirador-bogota.jpg" },
-  { id: 14, name: "Avistamiento de fauna · Guasca", layerId: "naturaleza", vereda: "San Cayetano", lat: 4.7500, lng: -73.9100, rating: 4.5,
-    activities: ["Avistamiento", "Naturaleza"],
-    description: "Sector de páramo y bosque alto con presencia de fauna nativa hacia el límite con Guasca." },
-  { id: 15, name: "Zona Trial 4x4 · Cuatrimotos", layerId: "aventura", vereda: "El Rodeo", lat: 4.7150, lng: -73.9500, rating: 4.6,
-    activities: ["Trial 4x4", "Cuatrimotos", "Enduro", "Buggies"],
-    description: "Corredor de motorsport y vehículos todo terreno por vías terciarias." },
-  { id: 16, name: "Ciclomontañismo · La Portada", layerId: "aventura", vereda: "La Portada", lat: 4.7250, lng: -73.9550, rating: 4.5,
-    activities: ["Ciclomontañismo", "Enduro"],
-    description: "Circuitos de bicicleta de montaña por el centro del municipio." },
-  { id: 17, name: "Cabalgatas El Salitre", layerId: "aventura", vereda: "El Salitre", lat: 4.6850, lng: -73.9650, rating: 4.4,
-    activities: ["Cabalgatas", "Paisaje"],
-    description: "Recorridos a caballo por paisajes rurales del sur." },
-  { id: 18, name: "Camping Buenos Aires Los Pinos", layerId: "alojamiento", vereda: "Buenos Aires Los Pinos", lat: 4.7250, lng: -73.9120, rating: 4.4,
-    activities: ["Camping", "Caminatas"],
-    description: "Zona de acampada y senderismo en el sector centro-oriental." },
-  { id: 19, name: "Hacienda Marquez · Eventos", layerId: "cultura", vereda: "San José del Triunfo", lat: 4.7800, lng: -73.9650, rating: 4.5,
-    activities: ["Eventos", "Patrimonio"],
-    description: "Hacienda para eventos y referente del corredor norte (San José del Triunfo)." },
-  { id: 20, name: "Iglesia de Tierra Nueva", layerId: "cultura", vereda: "Aurora Alta", lat: 4.7850, lng: -73.9900, rating: 4.3,
-    activities: ["Patrimonio", "Religioso"],
-    description: "Templo del centro poblado de Tierra Nueva, al noroccidente." },
-  { id: 21, name: "Iglesia de Mundo Nuevo", layerId: "cultura", vereda: "Mundo Nuevo", lat: 4.6700, lng: -73.8900, rating: 4.2,
-    activities: ["Patrimonio", "Religioso"],
-    description: "Templo del centro poblado de Mundo Nuevo, al suroriente." },
-  { id: 22, name: "Café de montaña", layerId: "gastronomia", vereda: "Casco urbano", lat: 4.7241, lng: -73.9676, rating: 4.4,
-    phone: "+57 300 000 0000", activities: ["Café", "Cocina local"],
-    description: "Prestador gastronómico de ejemplo para probar fichas, contacto y activación digital.",
-    tips: "Reemplazar por un negocio real con la base oficial.", image: "./photos/cafe-montana.jpg" },
-  { id: 23, name: "Ruta Gastronómica · Vía Principal", layerId: "gastronomia", vereda: "El Líbano", lat: 4.7100, lng: -73.9850, rating: 4.5,
-    activities: ["Gastronomía", "Paisaje"],
-    description: "Corredor de restaurantes sobre la vía principal Bogotá–La Calera con variada oferta de comida." },
-  { id: 24, name: "Hospedaje rural · El Hato", layerId: "alojamiento", vereda: "El Hato", lat: 4.7000, lng: -74.0100, rating: 4.3,
-    phone: "+57 310 000 0000", website: "https://turisoft.org/", activities: ["Alojamiento", "Naturaleza"],
-    description: "Alojamiento rural de ejemplo cerca de Piedra Iglesia y la vía a Bogotá.",
-    tips: "Reemplazar con datos verificados antes de publicar.", image: "./photos/hospedaje-rural.jpg" },
-  { id: 25, name: "Punto de información turística", layerId: "servicios", vereda: "Casco urbano", lat: 4.7203, lng: -73.9701, rating: 4.2,
-    activities: ["Información", "Atención"],
-    description: "Atención al visitante, inventario y coordinación de información turística.",
-    tips: "Capa de apoyo para gestores.", image: "./photos/punto-informacion.jpg" },
-  { id: 26, name: "Peaje · vía a Bogotá", layerId: "servicios", vereda: "Camino al Meta", lat: 4.6950, lng: -74.0150,
-    activities: ["Peaje"],
-    description: "Punto de peaje sobre el corredor vial hacia Bogotá (Calle 85 · Carrera 7)." },
-  { id: 27, name: "Estación de Servicio", layerId: "servicios", vereda: "Casco urbano", lat: 4.7180, lng: -73.9720,
-    activities: ["Combustible"],
-    description: "Estación de servicio para abastecimiento de combustible en el casco urbano." }
-];
-
-/* Las 30 veredas del municipio (coordenadas aproximadas por sector). */
-const VEREDAS = [
-  ["Altamar", 4.740, -73.945], ["Aurora Alta", 4.785, -73.990], ["Aurora Baja", 4.778, -73.992],
-  ["Buenos Aires La Epifanía", 4.722, -73.930], ["Buenos Aires Los Pinos", 4.726, -73.912], ["Camino al Meta", 4.690, -74.000],
-  ["El Hato", 4.700, -74.010], ["El Líbano", 4.712, -73.990], ["El Manzano", 4.690, -73.900],
-  ["El Rodeo", 4.715, -73.960], ["El Salitre", 4.682, -73.962], ["El Volcán", 4.702, -73.930],
-  ["Frailejonal", 4.675, -73.950], ["Jerusalén", 4.668, -73.942], ["La Hoya", 4.652, -73.935],
-  ["La Jangada", 4.660, -73.912], ["La Junia", 4.642, -73.930], ["La Polonia", 4.682, -73.910],
-  ["La Portada", 4.725, -73.952], ["La Toma", 4.742, -73.988], ["Marquez", 4.790, -73.972],
-  ["Mundo Nuevo", 4.672, -73.892], ["Quisquiza", 4.690, -73.922], ["San Cayetano", 4.762, -73.930],
-  ["San José de la Concepción", 4.762, -73.978], ["San José del Triunfo", 4.780, -73.962], ["San Rafael", 4.732, -73.992],
-  ["Santa Helena", 4.722, -73.978], ["Treinta y Seis", 4.662, -73.940], ["Tunjaque", 4.660, -73.928]
-];
-
-const veredaPlaces = VEREDAS.map((v, i) => ({
-  id: 100 + i, name: "Vereda " + v[0], layerId: "veredas", vereda: v[0], lat: v[1], lng: v[2],
-  activities: ["Vereda", "Territorio"],
-  description: "Vereda del municipio de La Calera. Unidad territorial para gestión, inventario y planeación turística.",
-  aprox: true
-}));
-
-const places = attractions.concat(veredaPlaces);
+const ROUTES = window.ROUTES || {};
+const ROUTE_META = window.ROUTE_META || {};
 
 const state = {
   mode: "traveler",
   query: "",
   activePlaceId: null,
+  managerOnboarded: false,
   activeLayers: Object.fromEntries(layers.map(layer => [layer.id, layer.defaultOn]))
 };
 
@@ -168,16 +46,6 @@ const routeLayer = L.layerGroup().addTo(map);
 /* ===== Uso del territorio (Brandbook): zonas con color + patrón (daltonismo).
    Gestor: visibles en todo el territorio (capa "Uso del territorio").
    Viajero: visibles al abrir un sendero. ===== */
-const ZONES = [
-  { type: "permitido",   name: "Zona de visita permitida",                coords: [[4.715,-73.985],[4.732,-73.982],[4.736,-73.958],[4.712,-73.952],[4.702,-73.968]] },
-  { type: "restringido", name: "Acceso restringido (motorsport / cantera)", coords: [[4.705,-73.945],[4.722,-73.935],[4.720,-73.908],[4.690,-73.912],[4.688,-73.935]] },
-  { type: "sensible",    name: "Ecosistema sensible (páramo y agua)",      coords: [[4.742,-74.000],[4.760,-73.985],[4.752,-73.962],[4.733,-73.973]] }
-];
-const ZONE_STYLE = {
-  permitido:   { color: "#2F9E5B", weight: 2, dashArray: null,  className: "zone-permitido" },
-  restringido: { color: "#E0A100", weight: 2, dashArray: "6 5", className: "zone-restringido" },
-  sensible:    { color: "#D64545", weight: 2, dashArray: "2 7", className: "zone-sensible" }
-};
 const zonesLayer = L.layerGroup();
 let usoLegendEl = null;
 
@@ -241,17 +109,37 @@ const placeList = document.querySelector("#places");
 const visibleCount = document.querySelector("#visible-count");
 const searchInput = document.querySelector("#search");
 const detail = document.querySelector("#detail");
+const modeContext = document.querySelector("#mode-context");
 const statsButton = document.querySelector("#stats-button");
 const statsModal = document.querySelector("#stats");
+const mobilePanelButtons = document.querySelectorAll("[data-mobile-panel]");
+const modeButtons = document.querySelectorAll("[data-mode]");
+document.body.dataset.mobilePanel = "map";
+document.body.dataset.mode = state.mode;
 
-document.querySelectorAll("[data-mode]").forEach(button => {
+function isMobileLayout() {
+  return window.matchMedia("(max-width: 820px)").matches;
+}
+
+function setMobilePanel(panel) {
+  const target = panel === "detail" && detail.hidden ? "places" : panel;
+  document.body.dataset.mobilePanel = target;
+  mobilePanelButtons.forEach(button => {
+    button.classList.toggle("is-active", button.dataset.mobilePanel === target);
+    button.setAttribute("aria-pressed", button.dataset.mobilePanel === target ? "true" : "false");
+  });
+  window.setTimeout(() => map.invalidateSize(), 80);
+}
+
+mobilePanelButtons.forEach(button => {
+  button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
+  button.addEventListener("click", () => setMobilePanel(button.dataset.mobilePanel));
+});
+
+modeButtons.forEach(button => {
+  button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
   button.addEventListener("click", () => {
-    state.mode = button.dataset.mode;
-    document.querySelectorAll("[data-mode]").forEach(item => item.classList.toggle("is-active", item === button));
-    statsButton.hidden = state.mode !== "manager";
-    if (state.activePlaceId) selectPlace(state.activePlaceId);
-    render();
-    updateZones();
+    setMode(button.dataset.mode);
   });
 });
 
@@ -269,9 +157,66 @@ document.querySelector("#close-stats").addEventListener("click", () => {
 });
 
 function render() {
+  renderModeContext();
   renderLayers();
   renderPlaces();
   updateZones();
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  if (mode === "manager" && !state.managerOnboarded) {
+    state.activeLayers.veredas = true;
+    state.activeLayers.uso = true;
+    state.managerOnboarded = true;
+  }
+  document.body.dataset.mode = mode;
+  modeButtons.forEach(item => {
+    const isActive = item.dataset.mode === mode;
+    item.classList.toggle("is-active", isActive);
+    item.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+  statsButton.hidden = mode !== "manager";
+  searchInput.placeholder = mode === "manager" ? "Buscar fichas, veredas o alertas..." : "Buscar experiencias...";
+  if (state.activePlaceId) selectPlace(state.activePlaceId);
+  render();
+  updateZones();
+}
+
+function renderModeContext() {
+  if (!modeContext) return;
+  const visible = getVisiblePlaces();
+  const activeLayerCount = getAllowedLayers().filter(layer => state.activeLayers[layer.id]).length;
+  const rntCount = visible.filter(place => RNT[place.id]).length;
+  const pendingCount = visible.filter(place => getDataQuality(place).status !== "complete").length;
+  const routeCount = visible.filter(place => hasRoute(place.id) || richData(place).sendero).length;
+
+  if (state.mode === "manager") {
+    modeContext.innerHTML = `
+      <div class="mode-copy">
+        <strong>Gestor territorial</strong>
+        <span>Inventario, cobertura, verificación y decisiones de operación.</span>
+      </div>
+      <div class="mode-kpis">
+        <span><b>${visible.length}</b> fichas</span>
+        <span><b>${pendingCount}</b> por revisar</span>
+        <span><b>${activeLayerCount}</b> capas activas</span>
+      </div>
+    `;
+    return;
+  }
+
+  modeContext.innerHTML = `
+    <div class="mode-copy">
+      <strong>Viajero</strong>
+      <span>Experiencias, rutas y servicios listos para decidir la visita.</span>
+    </div>
+    <div class="mode-kpis">
+      <span><b>${visible.length}</b> lugares</span>
+      <span><b>${routeCount}</b> con ruta</span>
+      <span><b>${rntCount}</b> RNT</span>
+    </div>
+  `;
 }
 
 function renderLayers() {
@@ -317,60 +262,127 @@ function renderPlaces() {
     button.className = `place-row ${state.activePlaceId === place.id ? "is-active" : ""}`;
     button.type = "button";
     button.innerHTML = `
-      <span class="dot" style="background:${layer.color}"></span>
-      <strong>${place.name}<span>${layer.label}</span></strong>
+      <span class="dot place-dot" style="background:${layer.color}"></span>
+      <strong class="place-copy">
+        <span class="place-title">${place.name}</span>
+        ${buildPlaceRowMeta(place, layer)}
+      </strong>
     `;
     button.addEventListener("click", () => selectPlace(place.id));
     placeList.appendChild(button);
   });
 }
 
-const ICONS = {
-  pin: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
-  star: '<svg width="15" height="15" viewBox="0 0 24 24" fill="#7BD14E" stroke="#7BD14E" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></svg>',
-  clock: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
-  phone: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2 4.1 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2Z"/></svg>',
-  globe: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/></svg>',
-  map: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18 3 21V6l6-3 6 3 6-3v15l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg>',
-  shield: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>',
-  users: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/></svg>',
-  access: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.6"/><path d="M5 7h14M12 7v6m0 0 3 6m-3-6-3 6"/></svg>',
-  foot: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a2 2 0 1 0 4 0c0-1-.5-2-1-3s-1-2-1-4a2 2 0 1 1 4 0c0 3-2 5-2 7"/><path d="M16 18a2 2 0 1 0 4 0c0-1-.5-2-1-3s-1-2-1-4a2 2 0 1 1 4 0c0 3-2 5-2 7"/></svg>',
-  check: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 12 2 2 4-4"/></svg>',
-  trend: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 17 13.5 8.5l-4 4L2 5"/><path d="M16 17h6v-6"/></svg>',
-  leaf: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-6 7-11 16-11 0 9-5 16-11 16Z"/><path d="M4 21c2-4 5-7 9-9"/></svg>',
-  arrow: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-  msg: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12 7.5L3 21l2-6a8.4 8.4 0 1 1 16-3.5Z"/></svg>',
-  edit: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
-  tip: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2Z"/><path d="M9 21h6"/></svg>'
-};
+function buildPlaceRowMeta(place, layer) {
+  const r = richData(place);
+  const quality = getDataQuality(place);
+
+  if (state.mode === "manager") {
+    const source = place.aprox ? "GPS aprox." : "GPS base";
+    const trust = RNT[place.id] ? "RNT" : quality.label;
+    return `
+      <span class="place-meta">${layer.label} · ${place.vereda || "La Calera"}</span>
+      <span class="place-flags">
+        <span class="place-chip ${quality.status === "complete" ? "is-ok" : "is-warn"}">${trust}</span>
+        <span class="place-chip">${source}</span>
+        <span class="place-chip">${quality.score}% datos</span>
+      </span>
+    `;
+  }
+
+  const rating = typeof place.rating === "number" ? ` · ★ ${place.rating.toFixed(1)}` : "";
+  const route = r.sendero ? ` · ${r.sendero.km} km` : "";
+  return `
+    <span class="place-meta">${layer.label} · ${place.vereda || "La Calera"}${rating}${route}</span>
+    <span class="place-flags">
+      ${RNT[place.id] ? '<span class="place-chip is-ok">RNT</span>' : ""}
+      ${r.capacity ? `<span class="place-chip">${r.capacity.today} cupos</span>` : ""}
+      ${place.phone ? '<span class="place-chip">WhatsApp</span>' : ""}
+    </span>
+  `;
+}
+
+function getDataQuality(place) {
+  const checks = [
+    Boolean(place.name),
+    Boolean(place.description),
+    typeof place.lat === "number" && typeof place.lng === "number",
+    Boolean(place.vereda),
+    Boolean(place.image),
+    Boolean(place.phone || place.website || RNT[place.id]),
+    !place.aprox
+  ];
+  const passed = checks.filter(Boolean).length;
+  const score = Math.round((passed / checks.length) * 100);
+  const status = score >= 72 ? "complete" : score >= 50 ? "review" : "draft";
+  const label = status === "complete" ? "Completa" : status === "review" ? "Revisar" : "Borrador";
+  return { score, status, label };
+}
+
+function buildRolePanel(place, r, isGestor, isVereda) {
+  const quality = getDataQuality(place);
+  const routeLabel = hasRoute(place.id) ? "GPS real" : r.sendero ? "Perfil estimado" : "Sin sendero";
+
+  if (isGestor) {
+    const tasks = [
+      { ok: !place.aprox, label: place.aprox ? "Ajustar coordenada GPS" : "GPS verificado" },
+      { ok: Boolean(place.image), label: place.image ? "Foto principal cargada" : "Agregar foto principal" },
+      { ok: Boolean(place.phone || place.website || RNT[place.id]), label: "Contacto / RNT" },
+      { ok: Boolean(place.description), label: "Descripción pública" }
+    ];
+    return `
+      <div class="role-panel role-panel--manager">
+        <div class="role-panel-head">
+          <span>Modo gestor</span>
+          <strong>${quality.label}</strong>
+        </div>
+        <div class="role-meter" aria-label="Calidad de datos ${quality.score}%">
+          <span style="width:${quality.score}%"></span>
+        </div>
+        <div class="manager-checklist">
+          ${tasks.map(task => `<span class="${task.ok ? "is-ok" : "is-warn"}">${task.ok ? ICONS.check : ICONS.tip}${task.label}</span>`).join("")}
+        </div>
+        <div class="manager-actions">
+          <button type="button">Validar datos</button>
+          <button type="button">Fuente pública</button>
+          <button type="button">Programar visita</button>
+        </div>
+      </div>
+    `;
+  }
+
+  if (isVereda) {
+    return `
+      <div class="role-panel role-panel--traveler">
+        <div class="role-panel-head">
+          <span>Territorio</span>
+          <strong>Referencia local</strong>
+        </div>
+        <div class="role-grid">
+          <span><b>${place.aprox ? "Aprox." : "GPS"}</b><small>Ubicación</small></span>
+          <span><b>Vereda</b><small>Unidad territorial</small></span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="role-panel role-panel--traveler">
+      <div class="role-panel-head">
+        <span>Para decidir</span>
+        <strong>${routeLabel}</strong>
+      </div>
+      <div class="role-grid">
+        <span><b>${r.sendero ? r.sendero.dur : "Abierto"}</b><small>Tiempo</small></span>
+        <span><b>${r.capacity ? r.capacity.today : "Mapa"}</b><small>${r.capacity ? "Cupos hoy" : "Cómo llegar"}</small></span>
+        <span><b>${r.huella.kg} kg</b><small>CO₂e estimado</small></span>
+      </div>
+    </div>
+  `;
+}
 
 const PROFILE_PATH = "M10 86 L48 78 L86 64 L120 70 L156 52 L196 38 L236 26 L290 16";
 const PROFILE_FILL = "M10 86 L48 78 L86 64 L120 70 L156 52 L196 38 L236 26 L290 16 L290 99 L10 99 Z";
-
-const TAG_MAP = {
-  naturaleza: ["Naturaleza", "Paisaje"], aventura: ["Aventura", "Aire libre"],
-  rutas: ["Sendero", "Caminata"], cultura: ["Patrimonio", "Cultura"], gastronomia: ["Gastronomía", "Café"],
-  alojamiento: ["Descanso", "Naturaleza"], servicios: ["Servicio"], veredas: ["Vereda", "Territorio"]
-};
-
-const RNT = { 18: "28934", 22: "45821", 23: "50112", 24: "31207" };
-
-const ITINERARIES = {
-  6: [
-    { t: "Inicio", h: "Encuentro - Buenos Aires", d: "Registro de visitantes y briefing de seguridad antes de iniciar." },
-    { t: "+1.0 km", h: "Quebrada y puente", d: "Cruce de quebrada y primer tramo de bosque de niebla." },
-    { t: "+2.4 km", h: "Mirador de niebla", d: "Pausa de avistamiento de aves rapaces y fotografía." },
-    { t: "Cima", h: "Peña de las Águilas", d: "Cumbre rocosa con vista panorámica del valle." },
-    { t: "Retorno", h: "Descenso guiado", d: "Regreso al punto de encuentro por la misma ruta." }
-  ],
-  7: [
-    { t: "Inicio", h: "Acceso a la quebrada", d: "Punto de partida hacia las cascadas de Tunjaque." },
-    { t: "Tramo 1", h: "Sendero de bosque", d: "Caminata entre vegetación nativa y miradores." },
-    { t: "Cascada", h: "Salto principal", d: "Llegada a la caída de agua, zona de baño y descanso." },
-    { t: "Retorno", h: "Regreso", d: "Camino de vuelta con interpretación ambiental." }
-  ]
-};
 
 function richData(p) {
   const id = p.id, L = p.layerId;
@@ -407,11 +419,10 @@ function drawRoute(place) {
   L.circleMarker(a, { radius: 6, color: "#fff", weight: 2, fillColor: "#7BD14E", fillOpacity: 1 }).addTo(routeLayer).bindPopup("Inicio del sendero");
   L.circleMarker(b, { radius: 6, color: "#fff", weight: 2, fillColor: "#0E5E5C", fillOpacity: 1 }).addTo(routeLayer).bindPopup("Fin del sendero");
   map.fitBounds(L.polyline(line).getBounds(), { padding: [70, 70], maxZoom: 16 });
-  routeActive = true;
   updateZones();
 }
 
-function clearRoute() { routeLayer.clearLayers(); routeActive = false; updateZones(); }
+function clearRoute() { routeLayer.clearLayers(); updateZones(); }
 
 function selectPlace(placeId) {
   const place = places.find(item => item.id === placeId);
@@ -440,6 +451,7 @@ function selectPlace(placeId) {
   ).join("");
   const accBadge = r.acc ? `<span class="tsb-badge tsb-badge--warn">${ICONS.access}Accesible: ${r.acc}</span>` : "";
   const tagsHtml = r.tags.map(t => `<span class="tsb-tag">${t}</span>`).join("");
+  const rolePanel = buildRolePanel(place, r, isGestor, isVereda);
 
   let dataSection = "";
   if (!isVereda && r.sendero) {
@@ -545,6 +557,7 @@ function selectPlace(placeId) {
         <div class="ficha-loc2">${ICONS.pin}<span>${place.vereda || "La Calera, Cundinamarca"}</span><span style="color:var(--border-strong)">·</span><span class="km">${r.distKm} km</span></div>
         ${place.description ? `<p class="ficha-desc2">${place.description}</p>` : ""}
         <div class="ficha-tags">${tagsHtml}</div>
+        ${rolePanel}
         ${rntChip}
         ${carousel}
         ${dataSection}
@@ -560,6 +573,7 @@ function selectPlace(placeId) {
   const rntBtn = detail.querySelector(".ficha-rnt");
   if (rntBtn) rntBtn.addEventListener("click", function () { openRnt(place); });
   initCarousel(detail.querySelector(".ficha-carousel"));
+  if (isMobileLayout()) setMobilePanel("detail");
   renderPlaces();
   updateZones();
 }
@@ -569,6 +583,7 @@ function closeDetail() {
   detail.classList.remove("is-ficha");
   state.activePlaceId = null;
   clearRoute();
+  if (isMobileLayout()) setMobilePanel("places");
   renderPlaces();
   updateZones();
 }

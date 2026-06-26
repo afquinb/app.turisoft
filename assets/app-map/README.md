@@ -2,22 +2,56 @@
 
 Versión local editable del mapa para publicar en `app.turisoft.org`.
 
-## Cómo editar
+## Arquitectura local
 
-1. Abre `app.js`.
-2. Cambia los registros del arreglo `places`.
-3. Para crear una nueva capa, agrega un objeto en `layers` y usa ese `id` en los lugares.
-4. Revisa el mapa local antes de subirlo.
+- `app.js`: orquesta Leaflet, estado, filtros, fichas y render.
+- `data/catalog.js`: inventario local reutilizable por front y backend.
+- `ui/icons.js`: iconos SVG usados por la ficha.
+- `routes.js`: trazas GPS expuestas en `window.ROUTES`.
+- `backend/server.mjs`: API local sin dependencias y servidor estático.
+- `backend/db/schema.sql`: modelo inicial MariaDB.
 
-## Cómo correr local
+## Cómo editar datos
 
-Con el runtime incluido en Codex:
+1. Abre `data/catalog.js`.
+2. Cambia registros en `places`, `layers`, `VEREDAS`, `ZONES`, `RNT` o `ITINERARIES`.
+3. Revisa el mapa local antes de subirlo.
 
-```powershell
-C:\Users\ANDRES\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe ..\..\tools\dev-server.mjs
+## Cómo correr local estático
+
+```bash
+python3 -m http.server 8766 --bind 127.0.0.1
 ```
 
-También se puede subir la carpeta completa a un hosting estático. Para `app.turisoft.org`, la raíz publicada puede ser esta carpeta.
+URL: `http://127.0.0.1:8766/`
+
+## Cómo correr con backend local
+
+```bash
+npm run dev
+```
+
+URL: `http://127.0.0.1:8770/`
+
+API:
+
+- `GET /api/health`
+- `GET /api/catalog`
+- `GET /api/categories`
+- `GET /api/veredas`
+- `GET /api/places`
+- `GET /api/places/:id`
+- `POST /api/events`
+
+## Chequeos
+
+```bash
+npm run check
+```
+
+La API usa `data/catalog.js` por ahora. El siguiente paso es reemplazar `backend/catalog-repository.mjs` por un repositorio MariaDB usando el esquema de `backend/db/schema.sql`.
+
+La carpeta completa todavía se puede subir a un hosting estático. Para `app.turisoft.org`, la raíz publicada puede ser esta carpeta.
 
 ## Archivos necesarios
 

@@ -24,7 +24,7 @@ Documento de repaso para pasar de la maqueta (datos demo) a una base de datos re
 
 ## 3. Modelo de base de datos propuesto
 
-Tablas principales (PostgreSQL o similar):
+Tablas principales. La versión aterrizada para este stage quedó en `backend/db/schema.sql` usando MariaDB:
 
 - **categorias** — id, slug, nombre, color, orden, visible_por_rol.
 - **veredas** — id, nombre, lat, lng, geometria (opcional).
@@ -51,8 +51,9 @@ Relaciones clave: lugar → categoría, vereda, prestador; lugar 1:N fotos/rese�
 - Auth por rol → define modo (Viajero/Gestor) y qué prestador ve cada quien.
 
 ## 5. Próximos pasos sugeridos
-1. Elegir motor (p. ej. Postgres en Supabase/Neon) y crear el esquema anterior.
-2. Sembrar `categorias`, `veredas` y `lugares` con el inventario de `REFERENTE-mapa-lacalera.md`.
-3. Sustituir los arreglos demo de `app.js` por llamadas `fetch` a la API.
-4. Conectar analítica real vía `eventos_analitica`.
-5. Capturar coordenadas GPS reales para reemplazar las aproximadas.
+1. Crear una base nueva `turisoft_map` en MariaDB y aplicar `backend/db/schema.sql`.
+2. Sembrar `categories`, `villages` y `places` desde `data/catalog.js`.
+3. Reemplazar `backend/catalog-repository.mjs` por un adaptador MariaDB.
+4. Cambiar el front para consumir `/api/catalog` con fallback local.
+5. Conectar analítica real vía `analytics_events`.
+6. Capturar coordenadas GPS reales para reemplazar las aproximadas.

@@ -54,8 +54,9 @@
 
       <aside class="panel layers-panel">
         <div class="panel-head">
-          <p>Capas de información</p>
+          <p>Explorar mapa</p>
           <input id="search" type="search" placeholder="Buscar lugares..." />
+          <div id="mode-context" class="mode-context" aria-live="polite"></div>
         </div>
         <div id="layers" class="layer-list"></div>
         <div class="visible-head">
@@ -77,6 +78,25 @@
       <div id="rnt-modal" class="mini-modal" hidden>
         <div class="mini-card" id="rnt-card"></div>
       </div>
+
+      <nav class="mobile-dock" aria-label="Navegación móvil del mapa">
+        <button class="mobile-tab is-active" type="button" data-mobile-panel="map">
+          <span class="mobile-tab-ico" aria-hidden="true">◎</span>
+          <span>Mapa</span>
+        </button>
+        <button class="mobile-tab" type="button" data-mobile-panel="layers">
+          <span class="mobile-tab-ico" aria-hidden="true">▦</span>
+          <span>Capas</span>
+        </button>
+        <button class="mobile-tab" type="button" data-mobile-panel="places">
+          <span class="mobile-tab-ico" aria-hidden="true">⌕</span>
+          <span>Lugares</span>
+        </button>
+        <button class="mobile-tab" type="button" data-mobile-panel="detail">
+          <span class="mobile-tab-ico" aria-hidden="true">◌</span>
+          <span>Ficha</span>
+        </button>
+      </nav>
 
     </main>
 
@@ -101,6 +121,6 @@
       }
     </script>
     <script src="./routes.js"></script>
-    <script src="./app.js"></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
